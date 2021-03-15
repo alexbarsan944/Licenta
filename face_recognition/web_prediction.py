@@ -2,6 +2,7 @@ import face_recognition.api as face_recognition
 import cv2
 import numpy as np
 import pickle
+
 # Get a reference to webcam #0 (the default one)
 video_capture = cv2.VideoCapture(0)
 # Load a sample picture and learn how to recognize it.
@@ -10,14 +11,15 @@ video_capture = cv2.VideoCapture(0)
 with open('face_encodings.data', 'rb') as filehandle:
     known_face_encodings = pickle.load(filehandle)
 
+print(len(known_face_encodings))
 print(np.array(known_face_encodings).shape)
-known_face_names = [
-    "Alex", "Alex", "Alex", "Alex", "Alex",
-    "Costi", "Costi", "Costi", "Costi", "Costi",
-    "Raluca", "Raluca", "Raluca", "Raluca", "Raluca",
-    "Stefan", "Stefan", "Stefan", "Stefan", "Stefan",
-]
+names = ['Alex', 'Raluca', 'Costi', 'Stefan', 'CostiS']
+known_face_names = []
+for name in names:
+    for j in range(len(known_face_encodings) // len(names)):
+        known_face_names.append(name)
 
+print(known_face_names)
 # Initialize some variables
 face_locations = []
 face_encodings = []
@@ -47,6 +49,7 @@ while True:
             name = "Unknown"
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
+
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]
 

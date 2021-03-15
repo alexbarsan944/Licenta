@@ -2,28 +2,28 @@ import PIL.Image
 import dlib
 import numpy as np
 from PIL import ImageFile
-import face_recognition_models
+from pkg_resources import resource_filename
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 face_detector = dlib.get_frontal_face_detector()
 
-predictor_5_point_model = face_recognition_models.pose_predictor_five_point_model_location()
+predictor_5_point_model = resource_filename(__name__, "../models/shape_predictor_5_face_landmarks.dat")
 pose_predictor_5_point = dlib.shape_predictor(predictor_5_point_model)
 
-face_recognition_model = face_recognition_models.face_recognition_model_location()
+face_recognition_model = resource_filename(__name__, "../models/dlib_face_recognition_resnet_model_v1.dat")
 face_encoder = dlib.face_recognition_model_v1(face_recognition_model)
 
 
-def _rect_to_css(rect):
+def rect_to_trbl(rect):
     return rect.top(), rect.right(), rect.bottom(), rect.left()
 
 
-def _css_to_rect(css):
+def trbl_to_rect(css):
     return dlib.rectangle(css[3], css[0], css[1], css[2])
 
 
-def _trim_css_to_bounds(css, image_shape):
+def trim_trbl(css, image_shape):
     return max(css[0], 0), min(css[1], image_shape[1]), min(css[2], image_shape[0]), max(css[3], 0)
 
 
@@ -46,7 +46,7 @@ def _raw_face_locations(img, number_of_times_to_upsample=1):
 
 
 def face_locations(img, number_of_times_to_upsample=1):
-    return [_trim_css_to_bounds(_rect_to_css(face), img.shape) for face in
+    return [trim_trbl(rect_to_trbl(face), img.shape) for face in
             _raw_face_locations(img, number_of_times_to_upsample)]
 
 
@@ -54,7 +54,7 @@ def _raw_face_landmarks(face_image, face_locations=None):
     if face_locations is None:
         face_locations = _raw_face_locations(face_image)
     else:
-        face_locations = [_css_to_rect(face_location) for face_location in face_locations]
+        face_locations = [trbl_to_rect(face_location) for face_location in face_locations]
 
     pose_predictor = pose_predictor_5_point
 

@@ -7,7 +7,7 @@ from os import listdir
 
 # You can download the required pre-trained face detection model here:
 # http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
-predictor_model = "/Users/alexandrubarsan/Documents/GitHub/Licenta/models/shape_predictor_5_face_landmarks.dat"
+predictor_model = "/Users/alexandrubarsan/Documents/GitHub/Licenta/models/shape_predictor_68_face_landmarks.dat"
 
 mypath = '../dataset/CostiS'
 # Take the image file name from the command line
@@ -41,6 +41,7 @@ for pic_no, file_name in enumerate(onlyfiles):
         pose_landmarks = face_pose_predictor(image, face_rect)
 
         # Use openface to calculate and perform the face alignment
-        alignedFace = face_aligner.align(128, image, face_rect, landmarkIndices=openface.AlignDlib.OUTER_EYES_AND_NOSE)
+        alignedFace = face_aligner.align(128, image, face_rect,
+                                         landmarkIndices=openface.AlignDlib.OUTER_EYES_AND_NOSE)
         # Save the aligned image to a file
         cv2.imwrite("aligned_faces/CostiS/aligned_face_{}.jpg".format(pic_no), alignedFace)

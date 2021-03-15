@@ -4,12 +4,12 @@ import face_recognition.api as face_recognition
 
 known_face_encodings = []
 total = {}
-for name in ['Alex', 'Costi', 'Raluca', 'Stefan']:
+for name in ['Alex', 'Raluca', 'Costi', 'Stefan', 'CostiS']:
     counter = 0
-    directory = '/Users/alexandrubarsan/Documents/GitHub/Licenta/face_detection/aligned_faces/' + name + '/'
+    directory = '/Users/alexandrubarsan/Documents/GitHub/Licenta/dataset/' + name + '/'
     print(name)
     for filename in os.listdir(directory):
-        if counter < 10:
+        if counter < 500:
             image = face_recognition.load_image_file(directory + filename)
             enc = face_recognition.face_encodings(image)
             if len(enc) != 0:
