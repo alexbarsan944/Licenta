@@ -13,7 +13,8 @@ with open('face_encodings.data', 'rb') as filehandle:
 
 print(len(known_face_encodings))
 print(np.array(known_face_encodings).shape)
-names = ['Alex', 'Raluca', 'Costi', 'Stefan', 'CostiS']
+names = face_recognition.get_people()
+
 known_face_names = []
 for name in names:
     for j in range(len(known_face_encodings) // len(names)):
@@ -49,6 +50,7 @@ while True:
             name = "Unknown"
             face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
             best_match_index = np.argmin(face_distances)
+            print(best_match_index)
 
             if matches[best_match_index]:
                 name = known_face_names[best_match_index]

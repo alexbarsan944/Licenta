@@ -3,6 +3,7 @@ import dlib
 import numpy as np
 from PIL import ImageFile
 from pkg_resources import resource_filename
+import os
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -73,12 +74,12 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
             raw_landmark_set in raw_landmarks]
 
 
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.6):
+def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.42):
     return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
 
 
 def face_landmarks(face_image, face_locations=None):
-    landmarks = _raw_face_landmarks(face_image, face_locations, model='68')
+    landmarks = _raw_face_landmarks(face_image, face_locations, model='5')
     landmarks_as_tuples = [[(p.x, p.y) for p in landmark.parts()] for landmark in landmarks]
     return [{
         "left_eyebrow": points[17:22],
@@ -87,3 +88,17 @@ def face_landmarks(face_image, face_locations=None):
         "left_eye": points[36:42],
         "right_eye": points[42:48]
     } for points in landmarks_as_tuples]
+
+
+def get_people():
+    import pickle
+    people = []
+    abs_path = os.path.abspath('../face_recognition/encodings_counter.data')
+    with open(abs_path, 'rb') as filehandle:
+        # read the data as binary data stream
+        counter = pickle.load(filehandle)
+    for k in counter:
+        people.append(k)
+    return people
+
+get_people()
