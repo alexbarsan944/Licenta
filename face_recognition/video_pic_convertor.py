@@ -17,3 +17,4 @@ def video_pic_convertor(video_location, output_location):
 video_location = '/Users/alexandrubarsan/Documents/GitHub/Licenta/face_recognition/train_videos/costi-train.mp4'
 
 video_pic_convertor(video_location, 'train_pictures')
+# TODO put this in api

@@ -74,7 +74,7 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
             raw_landmark_set in raw_landmarks]
 
 
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.42):
+def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.6):
     return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
 
 
@@ -90,10 +90,10 @@ def face_landmarks(face_image, face_locations=None):
     } for points in landmarks_as_tuples]
 
 
-def get_people():
+def get_known_people():
     import pickle
     people = []
-    abs_path = os.path.abspath('../face_recognition/encodings_counter.data')
+    abs_path = os.path.abspath('face_recognition/encodings_counter.data')
     with open(abs_path, 'rb') as filehandle:
         # read the data as binary data stream
         counter = pickle.load(filehandle)
@@ -101,4 +101,3 @@ def get_people():
         people.append(k)
     return people
 
-get_people()
