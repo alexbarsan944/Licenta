@@ -13,7 +13,7 @@ with open('face_encodings.data', 'rb') as filehandle:
 
 print(len(known_face_encodings))
 print(np.array(known_face_encodings).shape)
-names = face_recognition.get_known_people()
+names = face_recognition.get_known_people_from_encodings()
 
 known_face_names = []
 for name in names:

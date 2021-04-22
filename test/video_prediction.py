@@ -8,7 +8,7 @@ from pathlib import Path
 
 def produce_video(person):
     video = f"{person}.mp4"
-    people = face_recognition.get_known_people()
+    people = face_recognition.get_known_people_from_encodings()
     for idx, p in enumerate(people):
         people[idx] = p.lower()
 
@@ -32,7 +32,7 @@ def produce_video(person):
     with open('face_recognition/face_encodings.data', 'rb') as filehandle:
         known_face_encodings = pickle.load(filehandle)
 
-    names = face_recognition.get_known_people()
+    names = face_recognition.get_known_people_from_encodings()
     known_face_names = []
     for name in names:
         for j in range(len(known_face_encodings) // len(names)):

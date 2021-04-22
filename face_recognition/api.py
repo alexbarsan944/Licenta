@@ -4,6 +4,7 @@ import numpy as np
 from PIL import ImageFile
 from pkg_resources import resource_filename
 import os
+import cv2
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -74,7 +75,7 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
             raw_landmark_set in raw_landmarks]
 
 
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.6):
+def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.5):
     return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
 
 
@@ -90,14 +91,70 @@ def face_landmarks(face_image, face_locations=None):
     } for points in landmarks_as_tuples]
 
 
-def get_known_people():
+def video_pic_convertor(video_location, output_location):
+    # TODO : add face detection to output
+    vidcap = cv2.VideoCapture(video_location)
+    success, image = vidcap.read()
+    count = 0
+    while success:
+        cv2.imwrite(f"{output_location}/frame%d.jpg" % count, image)  # save frame as JPEG file
+        success, image = vidcap.read()
+        print('Read a new frame: ', success, count)
+        count += 1
+
+
+def get_known_people_from_dataset():
+    directory = resource_filename(__name__, '../dataset')
+    temp = []
+    name_list = []
+    for subdir, dirs, files in os.walk(directory):
+        temp = dirs
+        break
+    for name in temp:
+        if name == '__pycache__' or name == 'data' or name == '.DS_Store':
+            pass
+        else:
+            name_list.append(name)
+    return name_list
+
+
+# print(get_known_people_from_dataset())
+
+
+def get_known_people_from_encodings():
+    def unnest(d):
+        from pandas.io.json._normalize import nested_to_record
+        return nested_to_record(d, sep='_')
+
     import pickle
     people = []
-    abs_path = os.path.abspath('face_recognition/encodings_counter.data')
+    abs_path = resource_filename(__name__, 'encodings_counter.data')
+    # abs_path = os.path.abspath('face_recognition/encodings_counter.data')
     with open(abs_path, 'rb') as filehandle:
         # read the data as binary data stream
-        counter = pickle.load(filehandle)
-    for k in counter:
+        objs = []
+        while 1:
+            try:
+                objs.append(pickle.load(filehandle))
+            except EOFError:
+                break
+    print(objs)
+    counter = unnest(objs)
+    for k in counter[0]:
         people.append(k)
     return people
 
+
+# print(get_known_people_from_encodings())
+
+
+def get_path_form_name(name):
+    known_people = get_known_people_from_encodings()
+    if name not in known_people:
+        return None
+    else:
+        abs_path = resource_filename(__name__, "../dataset/" + name)
+        print(abs_path)
+    return abs_path
+
+# get_path_form_name('Alex')
