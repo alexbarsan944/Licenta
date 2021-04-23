@@ -75,7 +75,7 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
             raw_landmark_set in raw_landmarks]
 
 
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.5):
+def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.53):
     return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
 
 
@@ -138,7 +138,6 @@ def get_known_people_from_encodings():
                 objs.append(pickle.load(filehandle))
             except EOFError:
                 break
-    print(objs)
     counter = unnest(objs)
     for k in counter[0]:
         people.append(k)
@@ -149,11 +148,18 @@ def get_known_people_from_encodings():
 
 
 def get_path_form_name(name):
+    def get_full_path(filename):
+        path = (os.path.expanduser('~/Documents/GitHub/Licenta'))
+        for dirpath, dirnames, filenames in os.walk(path):
+            for filename in [f for f in filenames if f.endswith(filename)]:
+                return os.path.join(dirpath, filename)
+        return None
+
     known_people = get_known_people_from_encodings()
     if name not in known_people:
         return None
     else:
-        abs_path = resource_filename(__name__, "../dataset/" + name)
+        abs_path = get_full_path(name)
         print(abs_path)
     return abs_path
 

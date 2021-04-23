@@ -52,7 +52,7 @@ def store_face_encodings(name, dataset_count=60):
 # store_face_encodings('Alex2')
 
 
-def store_face_encodings_all(dataset_count=60):
+def store_face_encodings_all(dataset_count=300):
     known_face_encodings = []
     total = {}
     names = face_recognition.get_known_people_from_dataset()

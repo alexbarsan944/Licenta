@@ -7,29 +7,55 @@ from pathlib import Path
 
 
 def produce_video(person):
+    def get_full_path(filename):
+        path = (os.path.expanduser('~/Documents/GitHub/Licenta'))
+        for dirpath, dirnames, filenames in os.walk(path):
+            for filename in [f for f in filenames if f.endswith(filename)]:
+                return os.path.join(dirpath, filename)
+        return None
+
+    def get_full_path_name(filename):
+        path = (os.path.expanduser('~/Documents/GitHub/Licenta'))
+        for dirpath, dirnames, filenames in os.walk(path):
+            for filename in [f for f in filenames if f.startswith(filename)]:
+                if 'known' in dirpath or 'unknown' in dirpath:
+                    return os.path.join(dirpath, filename)
+        return None
+
+    def get_full_path_dir(dir):
+        path = (os.path.expanduser('~/Documents/GitHub/Licenta'))
+        for dirpath, dirnames, filenames in os.walk(path):
+            if dir in dirnames:
+                return os.path.join(dirpath, dir)
+        return None
+
     video = f"{person}.mp4"
     people = face_recognition.get_known_people_from_encodings()
     for idx, p in enumerate(people):
         people[idx] = p.lower()
 
-    input_movie = cv2.VideoCapture(f"test/videos/known/{video}")
+    movie_path = get_full_path_name(person)
+    input_movie = cv2.VideoCapture(movie_path)
 
     if person not in people:
         try:
-            input_movie = cv2.VideoCapture(f"test/videos/unknown/{video}")
+            input_movie = cv2.VideoCapture(movie_path)
         except:
             pass
         else:
             print('Video not found')
+            exit(1)
 
     length = int(input_movie.get(cv2.CAP_PROP_FRAME_COUNT))
 
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     wid, leng = input_movie.get(3), input_movie.get(4)
 
-    output_movie = cv2.VideoWriter(f'output/{video}', fourcc, 29.97, (int(wid), int(leng)))
-
-    with open('face_recognition/face_encodings.data', 'rb') as filehandle:
+    output_path = get_full_path_dir('output')
+    output_movie = cv2.VideoWriter(f'{output_path}/{video}', fourcc, 29.97, (int(wid), int(leng)))
+    print(input_movie)
+    face_enc_path = get_full_path('face_encodings.data')
+    with open(face_enc_path, 'rb') as filehandle:
         known_face_encodings = pickle.load(filehandle)
 
     names = face_recognition.get_known_people_from_encodings()
@@ -92,7 +118,7 @@ def produce_video(person):
     pass
 
 
-# produce_video(person='alex')
+produce_video(person='alex')
 # produce_video(person='costiS')
 # produce_video(person='costi')
 # produce_video(person='stefan')
