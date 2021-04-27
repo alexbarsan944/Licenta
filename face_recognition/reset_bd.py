@@ -4,7 +4,7 @@ import face_recognition.api as face_recognition
 from pkg_resources import resource_filename
 
 
-def store_face_encodings_all(dataset_count=300):
+def store_face_encodings_all(dataset_count=140):
     known_face_encodings = []
     total = {}
     names = face_recognition.get_known_people_from_dataset()
@@ -41,4 +41,4 @@ def store_face_encodings_all(dataset_count=300):
     print(counter)
 
 
-store_face_encodings_all()
+# store_face_encodings_all()

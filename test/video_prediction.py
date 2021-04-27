@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 
 
-def produce_video(person):
+def produce_video(abs_path_to_video):
     def get_full_path(filename):
         path = (os.path.expanduser('~/Documents/GitHub/Licenta'))
         for dirpath, dirnames, filenames in os.walk(path):
@@ -29,22 +29,12 @@ def produce_video(person):
                 return os.path.join(dirpath, dir)
         return None
 
-    video = f"{person}.mp4"
     people = face_recognition.get_known_people_from_encodings()
     for idx, p in enumerate(people):
         people[idx] = p.lower()
 
-    movie_path = get_full_path_name(person)
+    movie_path = abs_path_to_video
     input_movie = cv2.VideoCapture(movie_path)
-
-    if person not in people:
-        try:
-            input_movie = cv2.VideoCapture(movie_path)
-        except:
-            pass
-        else:
-            print('Video not found')
-            exit(1)
 
     length = int(input_movie.get(cv2.CAP_PROP_FRAME_COUNT))
 
@@ -52,9 +42,11 @@ def produce_video(person):
     wid, leng = input_movie.get(3), input_movie.get(4)
 
     output_path = get_full_path_dir('output')
-    output_movie = cv2.VideoWriter(f'{output_path}/{video}', fourcc, 29.97, (int(wid), int(leng)))
-    print(input_movie)
+    person_name = abs_path_to_video.split('.')[0].split('/')[-1]
+
+    output_movie = cv2.VideoWriter(f'{output_path}/{person_name}.mp4', fourcc, 29.97, (int(wid), int(leng)))
     face_enc_path = get_full_path('face_encodings.data')
+
     with open(face_enc_path, 'rb') as filehandle:
         known_face_encodings = pickle.load(filehandle)
 
@@ -65,7 +57,8 @@ def produce_video(person):
             known_face_names.append(name)
 
     frame_number = 0
-
+    right_prediction = 0
+    face_names = []
     while True:
         ret, frame = input_movie.read()
         frame_number += 1
@@ -80,7 +73,6 @@ def produce_video(person):
         face_locations = face_recognition.face_locations(rgb_frame)
         face_encodings = face_recognition.face_encodings(rgb_frame, face_locations)
 
-        face_names = []
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)
             matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
@@ -94,7 +86,8 @@ def produce_video(person):
                 name = known_face_names[best_match_index]
 
             face_names.append(name)
-
+            if name == person_name:
+                right_prediction += 1
         # Label the results
         for (top, right, bottom, left), name in zip(face_locations, face_names):
             if not name:
@@ -109,22 +102,24 @@ def produce_video(person):
             cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
 
         # Write the resulting image to the output video file
-        print("Writing frame {} / {}".format(frame_number, length))
+        if frame_number % 10 == 0:
+            print("Writing frame {} / {}".format(frame_number, length))
         output_movie.write(frame)
 
     # All done!
     input_movie.release()
     cv2.destroyAllWindows()
+
+    return face_names
     pass
 
-
-produce_video(person='alex')
+# produce_video(person='alex')
 # produce_video(person='costiS')
 # produce_video(person='costi')
 # produce_video(person='stefan')
 # produce_video(person='raluca')
 # produce_video(person='stockvideo2')
-# produce_video(person='asd')
+# produce_video('')
 
 # def produce_videos(person='all'):
 #     if person != 'all':
