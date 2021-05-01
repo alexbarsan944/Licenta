@@ -91,15 +91,15 @@ def face_landmarks(face_image, face_locations=None):
     } for points in landmarks_as_tuples]
 
 
-def video_pic_convertor(video_location, output_location):
+def video_pic_convertor(video_location, output_location, count=0):
     # TODO : add face detection to output
     vidcap = cv2.VideoCapture(video_location)
     success, image = vidcap.read()
-    count = 0
     while success:
-        cv2.imwrite(f"{output_location}/frame%d.jpg" % count, image)  # save frame as JPEG file
+        cv2.imwrite(f"{output_location}/frame{count}.jpg", image)  # save frame as JPEG file
         success, image = vidcap.read()
-        print('Read a new frame: ', success, count)
+        if count % 10 == 0:
+            print('Read a new frame: ', success, f"{output_location}/frame{count}.jpg")
         count += 1
 
 
@@ -114,7 +114,7 @@ def get_known_people_from_dataset():
         if name == '__pycache__' or name == 'data' or name == '.DS_Store':
             pass
         else:
-            name_list.append(name)
+            name_list.append(name.lower())
     return name_list
 
 

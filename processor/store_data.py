@@ -87,5 +87,3 @@ def store_face_encodings_all(dataset_count=300):
         counter = pickle.load(filehandle)
 
     print(counter)
-
-

@@ -59,6 +59,8 @@ def produce_video(abs_path_to_video):
     frame_number = 0
     right_prediction = 0
     face_names = []
+    faces = []
+
     while True:
         ret, frame = input_movie.read()
         frame_number += 1
@@ -88,6 +90,7 @@ def produce_video(abs_path_to_video):
             face_names.append(name)
             if name == person_name:
                 right_prediction += 1
+
         # Label the results
         for (top, right, bottom, left), name in zip(face_locations, face_names):
             if not name:
@@ -100,17 +103,17 @@ def produce_video(abs_path_to_video):
             cv2.rectangle(frame, (left, bottom - 25), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
-
+            faces.append(name)
         # Write the resulting image to the output video file
         if frame_number % 10 == 0:
             print("Writing frame {} / {}".format(frame_number, length))
         output_movie.write(frame)
 
     # All done!
+    # Release handle to the webcam
     input_movie.release()
     cv2.destroyAllWindows()
-
-    return face_names
+    return faces
     pass
 
 # produce_video(person='alex')

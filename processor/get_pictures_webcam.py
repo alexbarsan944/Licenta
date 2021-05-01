@@ -10,6 +10,7 @@ def get_pictures(name):
     detector = dlib.get_frontal_face_detector()
 
     # Load the predictor
+    # TODO : add _5_ here
     predictor_68_point_model = resource_filename(__name__, "../models/shape_predictor_68_face_landmarks.dat")
     predictor = dlib.shape_predictor(predictor_68_point_model)
 
@@ -32,10 +33,13 @@ def get_pictures(name):
             y2 = face.bottom()  # bottom point
 
             # Crop the face
-            if y1 >= 100 >= y2:
-                face_frame = frame[y1 - 100:y2 + 100, x1 - 100:x2 + 100]
-            else:
-                face_frame = frame[y1 - 50:y2 + 50, x1 - 50:x2 + 50]
+            # if y1 >= 100 >= y2:
+            #     face_frame = frame[y1 - 100:y2 + 100, x1 - 100:x2 + 100]
+            # else:
+            #     face_frame = frame[y1 - 50:y2 + 50, x1 - 50:x2 + 50]
+
+            face_frame = frame[int(0.8 * y1): int(1.2 * y2), int(0.8 * x1): int(x2 * 1.2)]
+
             # Create landmark object
             landmarks = predictor(image=gray, box=face)
 

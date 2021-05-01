@@ -8,6 +8,8 @@ import os
 
 
 def predict():
+    # TODO: get stats after test with webcam
+
     def get_full_path(filename):
         path = (os.path.expanduser('~/Documents/GitHub/Licenta'))
         for dirpath, dirnames, filenames in os.walk(path):
@@ -22,8 +24,6 @@ def predict():
     with open(path, 'rb') as filehandle:
         known_face_encodings = pickle.load(filehandle)
 
-    print(known_face_encodings)
-    print(np.array(known_face_encodings).shape)
     names = face_recognition.get_known_people_from_encodings()
 
     known_face_names = []
@@ -37,6 +37,7 @@ def predict():
     face_encodings = []
     face_names = []
     process_this_frame = True
+    faces = []
 
     while True:
         # Grab a single frame of video
@@ -58,7 +59,7 @@ def predict():
             for face_encoding in face_encodings:
                 # See if the face is a match for the known face(s)
                 matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-                name = "Unknown"
+                name = "unknown"
                 face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
                 best_match_index = np.argmin(face_distances)
                 # print(best_match_index)
@@ -85,6 +86,7 @@ def predict():
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+            faces.append(name.lower())
 
         # Display the resulting image
         cv2.imshow('Video', frame)
@@ -94,7 +96,7 @@ def predict():
             break
 
     # Release handle to the webcam
-    video_capture.release()
-    cv2.destroyAllWindows()
-
-
+    for i in range(1, 5):
+        cv2.destroyAllWindows()
+        cv2.waitKey(1)
+    return faces
