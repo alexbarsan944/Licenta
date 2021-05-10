@@ -8,8 +8,6 @@ import os
 
 
 def predict():
-    # TODO: get stats after test with webcam
-
     def get_full_path(filename):
         path = (os.path.expanduser('~/Documents/GitHub/Licenta'))
         for dirpath, dirnames, filenames in os.walk(path):
@@ -20,15 +18,23 @@ def predict():
     # Get a reference to webcam #0 (the default one)
     video_capture = cv2.VideoCapture(0)
     # Load a sample picture and learn how to recognize it.
+
     path = get_full_path('face_encodings.data')
     with open(path, 'rb') as filehandle:
         known_face_encodings = pickle.load(filehandle)
 
-    names = face_recognition.get_known_people_from_encodings()
+    path_counter = get_full_path('encodings_counter.data')
+    with open(path_counter, 'rb') as filehandle:
+        counter = pickle.load(filehandle)
 
+    names = []
+    for k, v in counter.items():
+        names.append(k)
+
+    print(names)
     known_face_names = []
     for name in names:
-        for j in range(len(known_face_encodings) // len(names)):
+        for j in range(counter[name]):
             known_face_names.append(name)
 
     print(known_face_names)
@@ -100,3 +106,6 @@ def predict():
         cv2.destroyAllWindows()
         cv2.waitKey(1)
     return faces
+
+
+predict()

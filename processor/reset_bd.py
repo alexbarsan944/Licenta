@@ -1,10 +1,57 @@
 import os
 import pickle
+
+import numpy as np
+
 import face_recognition.api as face_recognition
 from pkg_resources import resource_filename
 
 
-def store_face_encodings(name, dataset_count=300):
+def update_main_files_from_folder():
+    face_enc_dir = resource_filename(__name__, f'../face_recognition/face_encodings')
+    face_enc_counter_dir = resource_filename(__name__, f'../face_recognition/encodings_counter')
+    face_enc_file = resource_filename(__name__, f'../face_recognition/face_encodings.data')
+    face_enc_counter_file = resource_filename(__name__, f'../face_recognition/encodings_counter.data')
+
+    total = {}
+
+    known_face_encodings = []
+    for filename in os.listdir(face_enc_dir):
+        #  print(filename)
+        with open(face_enc_dir + '/' + filename, 'rb') as filehandle:  # read from directory
+            data = pickle.load(filehandle)
+            known_face_encodings.append(data)
+    l2d = []
+    for e1 in known_face_encodings:
+        for e2 in e1:
+            l2d.append(e2)
+    with open(face_enc_file, 'wb') as filehandle:
+        pickle.dump(l2d, filehandle)
+
+    for filename in os.listdir(face_enc_counter_dir):
+        # print(filename)
+        name = filename.split('.data')[0]
+        with open(face_enc_counter_dir + '/' + filename, 'rb') as filehandle:
+            data2 = pickle.load(filehandle)
+            total[name] = data2[name]
+
+    with open(face_enc_counter_file, 'wb') as filehandle:
+        pickle.dump(total, filehandle)
+
+
+def print_main_files():
+    face_enc = resource_filename(__name__, f'../face_recognition/face_encodings.data')
+    face_enc_counter = resource_filename(__name__, f'../face_recognition/encodings_counter.data')
+
+    with open(face_enc, 'rb') as filehandle:
+        data = pickle.load(filehandle)
+    with open(face_enc_counter, 'rb') as filehandle:
+        data2 = pickle.load(filehandle)
+    print(np.array(data).shape)
+    print(np.array(data2))
+
+
+def store_face_encodings(name, dataset_count=500):
     known_face_encodings = []
     total = {}
     counter = 0
@@ -19,30 +66,27 @@ def store_face_encodings(name, dataset_count=300):
                 if len(enc) != 0:
                     known_face_encodings.append(enc[0])
                     counter += 1
+                    if counter % 10 == 0:
+                        print(counter)
+        face_enc_dir = resource_filename(__name__, f'../face_recognition/face_encodings/{name}.data')
+        with open(face_enc_dir, 'wb') as filehandle:
+            # store the data as binary data stream
+            pickle.dump(known_face_encodings, filehandle)
+
     total[name] = counter
 
-    face_enc_dir = resource_filename(__name__, '../face_recognition/face_encodings.data')
-    face_enc_counter = resource_filename(__name__, '../face_recognition/encodings_counter.data')
-
-    with open(face_enc_dir, 'ab') as filehandle:
-        # store the data as binary data stream
-        pickle.dump(known_face_encodings, filehandle)
-
-    with open(face_enc_counter, 'ab') as filehandle:
-        # store the data as binary data stream
+    face_enc_counter = resource_filename(__name__, f'../face_recognition/encodings_counter/{name}.data')
+    with open(face_enc_counter, 'wb') as filehandle:
         pickle.dump(total, filehandle)
 
-    with open(face_enc_counter, 'rb') as filehandle:
-        # read the data as binary data stream
-        objs = []
-        while 1:
-            try:
-                objs.append(pickle.load(filehandle))
-            except EOFError:
-                break
+    update_main_files_from_folder()
+    print_main_files()
 
 
-def store_face_encodings_all(dataset_count=300):
+# update_main_files_from_folder()
+
+
+def store_face_encodings_all(dataset_count=500):
     known_face_encodings = []
     total = {}
     names = face_recognition.get_known_people_from_dataset()
