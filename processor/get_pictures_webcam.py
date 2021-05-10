@@ -10,7 +10,6 @@ def get_pictures(name):
     detector = dlib.get_frontal_face_detector()
 
     # Load the predictor
-    # TODO : add _5_ here
     predictor_68_point_model = resource_filename(__name__, "../models/shape_predictor_68_face_landmarks.dat")
     predictor = dlib.shape_predictor(predictor_68_point_model)
 
@@ -47,11 +46,11 @@ def get_pictures(name):
 
             cv2.imshow(winname="Face", mat=face_frame)
             save_location = resource_filename(__name__, "../dataset/" + name)
-            print(save_location)
             p = os.path.sep.join([save_location + '/', "{}.png".format(str(total).zfill(3))])
             cv2.imwrite(p, face_frame)
             total += 1
-            print(total)
+            if total % 10 == 0:
+                print(total)
 
         # Exit when escape is pressed
         if cv2.waitKey(delay=1) == 27 or total > 500:
@@ -62,5 +61,3 @@ def get_pictures(name):
 
     # Close all windows
     cv2.destroyAllWindows()
-
-
