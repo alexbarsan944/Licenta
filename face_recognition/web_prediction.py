@@ -106,6 +106,3 @@ def predict():
         cv2.destroyAllWindows()
         cv2.waitKey(1)
     return faces
-
-
-predict()

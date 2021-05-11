@@ -84,7 +84,7 @@ def store_face_encodings(name, dataset_count=500):
 
 
 # update_main_files_from_folder()
-
+# print_main_files()
 
 def store_face_encodings_all(dataset_count=500):
     known_face_encodings = []

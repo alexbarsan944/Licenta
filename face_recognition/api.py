@@ -92,10 +92,10 @@ def face_landmarks(face_image, face_locations=None):
 
 
 def video_pic_convertor(video_location, output_location, count=0):
-    # TODO : add face detection to output
     vidcap = cv2.VideoCapture(video_location)
     success, image = vidcap.read()
     while success:
+        # small = cv2.resize(image, (0, 0), fx=0.5, fy=0.5)
         cv2.imwrite(f"{output_location}/frame{count}.jpg", image)  # save frame as JPEG file
         success, image = vidcap.read()
         if count % 10 == 0:
