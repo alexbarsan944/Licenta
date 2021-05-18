@@ -1,12 +1,13 @@
-import face_recognition.api as face_recognition
+import os
+import pickle
+
 import cv2
 import numpy as np
-import pickle
-import os
-from pathlib import Path
+
+import face_recognition.api as face_recognition
 
 
-def produce_video(abs_path_to_video):
+def produce_video(abs_path_to_video, should_be):
     def get_full_path(filename):
         path = (os.path.expanduser('~/Documents/GitHub/Licenta'))
         for dirpath, dirnames, filenames in os.walk(path):
@@ -60,7 +61,7 @@ def produce_video(abs_path_to_video):
     right_prediction = 0
     face_names = []
     faces = []
-
+    acc = None
     while True:
         ret, frame = input_movie.read()
         frame_number += 1
@@ -88,12 +89,13 @@ def produce_video(abs_path_to_video):
                 name = known_face_names[best_match_index]
 
             face_names.append(name)
-            if name == person_name:
+            if name.lower() == should_be.lower():
                 right_prediction += 1
+            acc = right_prediction * 100 / len(face_names)
 
         # Label the results
-        for (top, right, bottom, left), name in zip(face_locations, face_names):
-            if not name:
+        for (top, right, bottom, left), name_ in zip(face_locations, face_names):
+            if not name_:
                 continue
 
             # Draw a box around the face
@@ -102,18 +104,19 @@ def produce_video(abs_path_to_video):
             # Draw a label with a name below the face
             cv2.rectangle(frame, (left, bottom - 25), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, name, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
-            faces.append(name)
+            cv2.putText(frame, name_, (left + 6, bottom - 6), font, 0.5, (255, 255, 255), 1)
+            faces.append(name_)
+
         # Write the resulting image to the output video file
         if frame_number % 10 == 0:
-            print("Writing frame {} / {}".format(frame_number, length))
+            print("Writing frame {} / {}".format(frame_number, length), f"Accuracy={acc}%")
         output_movie.write(frame)
 
     # All done!
     # Release handle to the webcam
     input_movie.release()
     cv2.destroyAllWindows()
-    return faces
+    return face_names
     pass
 
 # produce_video(person='alex')

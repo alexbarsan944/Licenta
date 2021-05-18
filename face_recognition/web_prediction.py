@@ -103,4 +103,4 @@ def predict():
     for i in range(1, 5):
         cv2.destroyAllWindows()
         cv2.waitKey(1)
-    return faces
+    return face_names
