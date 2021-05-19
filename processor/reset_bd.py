@@ -2,9 +2,9 @@ import os
 import pickle
 
 import numpy as np
+from pkg_resources import resource_filename
 
 import face_recognition.api as face_recognition
-from pkg_resources import resource_filename
 
 
 def update_main_files_from_folder():
@@ -83,10 +83,10 @@ def store_face_encodings(name, dataset_count=500):
     print_main_files()
 
 
+
+# store_face_encodings('ioana')
 # update_main_files_from_folder()
-
-
-print_main_files()
+# print_main_files()
 
 def store_face_encodings_all(dataset_count=500):
     known_face_encodings = []
