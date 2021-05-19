@@ -89,7 +89,7 @@ def predict(frames_count=30):
                     name = known_face_names[best_match_index]
 
                 face_names.append(name)
-
+                print(face_names)
             if not approved:
                 if check_if_right_name(name, face_list=faces) is True and name.lower() is not 'unknown':
                     approved = True
@@ -130,6 +130,7 @@ def predict(frames_count=30):
                 cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (127, 255, 0), cv2.FILLED)
                 font = cv2.FONT_HERSHEY_DUPLEX
                 cv2.putText(frame, f'Approved as {name}', (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+
                 faces.append(name.lower())
         # Display the resulting image
         cv2.imshow('Video', frame)

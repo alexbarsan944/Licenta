@@ -1,10 +1,10 @@
-import glob
+import os
+import pickle
 
-import face_recognition.api as face_recognition
 import cv2
 import numpy as np
-import pickle
-import os
+
+import face_recognition.api as face_recognition
 
 
 def predict():
@@ -17,6 +17,7 @@ def predict():
 
     # Get a reference to webcam #0 (the default one)
     video_capture = cv2.VideoCapture(0)
+
     # Load a sample picture and learn how to recognize it.
 
     path = get_full_path('face_encodings.data')
@@ -74,9 +75,8 @@ def predict():
                 face_names.append(name)
 
         process_this_frame = not process_this_frame
-
         # Display the results
-        for (top, right, bottom, left), name in zip(face_locations, face_names):
+        for (top, right, bottom, left), name_ in zip(face_locations, face_names):
             # Scale back up face locations since the frame we detected in was scaled to 1/4 size
             top *= 4
             right *= 4
@@ -89,9 +89,9 @@ def predict():
             # Draw a label with a name below the face
             cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
             font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
-            faces.append(name.lower())
+            cv2.putText(frame, name_, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
+            faces.append(name_.lower())
         # Display the resulting image
         cv2.imshow('Video', frame)
 
@@ -103,4 +103,4 @@ def predict():
     for i in range(1, 5):
         cv2.destroyAllWindows()
         cv2.waitKey(1)
-    return face_names
+    return faces

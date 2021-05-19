@@ -75,7 +75,7 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
             raw_landmark_set in raw_landmarks]
 
 
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.425):
+def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.4):
     return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
 
 
