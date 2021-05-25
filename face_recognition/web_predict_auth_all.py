@@ -3,12 +3,41 @@ import pickle
 import time
 
 import cv2
+import dlib
 import numpy as np
+from imutils import face_utils
+from scipy.spatial import distance as dist
 
 import face_recognition.api as face_recognition
 
+args = {
+    "shape_predictor": "models/shape_predictor_68_face_landmarks.dat"
+}
+detector = dlib.get_frontal_face_detector()
+predictor = dlib.shape_predictor(args["shape_predictor"])
+
 
 def predict(frames_count=30):
+    # START CODE FROM https://github.com/mmenxin/eye-blink-detection-demo
+
+    EYE_AR_THRESH = 0.3
+    EYE_AR_CONSEC_FRAMES = 1
+
+    COUNTER = 0
+    TOTAL = 0
+
+    (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_IDXS["left_eye"]
+    (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_IDXS["right_eye"]
+
+    def eye_aspect_ratio(eye):
+        A = dist.euclidean(eye[1], eye[5])
+        B = dist.euclidean(eye[2], eye[4])
+        C = dist.euclidean(eye[0], eye[3])
+        ear = (A + B) / (2.0 * C)
+        return ear
+
+    # STOP CODE FROM https://github.com/mmenxin/eye-blink-detection-demo
+
     def get_full_path(filename):
         path = (os.path.expanduser('~/Documents/GitHub/Licenta'))
         for dirpath, dirnames, filenames in os.walk(path):
@@ -69,34 +98,76 @@ def predict(frames_count=30):
 
         # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
         rgb_small_frame = small_frame[:, :, ::-1]
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        # Only process every other frame of video to save time
-        if process:
-            # Find all the faces and face encodings in the current frame of video
-            face_locations = face_recognition.face_locations(rgb_small_frame)
-            face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+        rects = detector(gray, 0)
 
-            face_names = []
-            for face_encoding in face_encodings:
-                # See if the face is a match for the known face(s)
-                matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-                name = "unknown"
-                face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
-                best_match_index = np.argmin(face_distances)
-                # print(best_match_index)
+        for rect in rects:
+            # START CODE FROM https://github.com/mmenxin/eye-blink-detection-demo
 
-                if matches[best_match_index]:
-                    name = known_face_names[best_match_index]
+            shape = predictor(gray, rect)
+            shape = face_utils.shape_to_np(shape)
 
-                face_names.append(name)
-                print(face_names)
-            if not approved:
-                if check_if_right_name(name, face_list=faces) is True and name.lower() is not 'unknown':
-                    approved = True
-                    total_time = time.time() - start_time
-                    number_of_frames = len(faces)
+            leftEye = shape[lStart:lEnd]
+            rightEye = shape[rStart:rEnd]
 
-        process = not process
+            leftEAR = eye_aspect_ratio(leftEye)
+            rightEAR = eye_aspect_ratio(rightEye)
+
+            ear = (leftEAR + rightEAR) / 2.0
+
+            leftEyeHull = cv2.convexHull(leftEye)
+            rightEyeHull = cv2.convexHull(rightEye)
+            cv2.drawContours(frame, [leftEyeHull], -1, (0, 255, 0), 1)
+            cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
+            if ear < EYE_AR_THRESH:
+                COUNTER += 1
+            else:
+
+                if COUNTER >= EYE_AR_CONSEC_FRAMES:
+                    TOTAL += 1
+
+                COUNTER = 0
+
+            cv2.putText(
+                frame,
+                "Blinks: {}".format(TOTAL),
+                (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.7,
+                (0, 0, 255),
+                2,
+            )
+        # STOP CODE FROM https://github.com/mmenxin/eye-blink-detection-demo
+        # START CODE FROM https://github.com/ageitgey/face_recognition
+
+        face_locations = face_recognition.face_locations(rgb_small_frame)
+        face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+
+        face_names = []
+        for face_encoding in face_encodings:
+            # See if the face is a match for the known face(s)
+            matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+            name = "unknown"
+            face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+            best_match_index = np.argmin(face_distances)
+            # print(best_match_index)
+
+            if matches[best_match_index]:
+                name = known_face_names[best_match_index]
+            # STOP CODE FROM https://github.com/ageitgey/face_recognition
+
+            if name == 'unknown':
+                approved = False
+                TOTAL = 0
+                COUNTER = 0
+
+            face_names.append(name)
+        if not approved:
+            if check_if_right_name(name, face_list=faces) is True and name.lower() != 'unknown' and TOTAL > 1:
+                approved = True
+                total_time = time.time() - start_time
+                number_of_frames = len(faces)
 
         # Display the results
         if approved is False:
@@ -119,7 +190,6 @@ def predict(frames_count=30):
                 left *= 4
 
                 cv2.rectangle(frame, (left, top), (right, bottom), (127, 255, 0), 2)
-
                 cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (127, 255, 0), cv2.FILLED)
                 font = cv2.FONT_HERSHEY_DUPLEX
                 cv2.putText(frame, f'Approved as {name}', (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
