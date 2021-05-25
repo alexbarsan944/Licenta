@@ -9,9 +9,6 @@ def get_pictures(name):
     # Load the detector
     detector = dlib.get_frontal_face_detector()
 
-    # Load the predictor
-    predictor_68_point_model = resource_filename(__name__, "../models/shape_predictor_68_face_landmarks.dat")
-    predictor = dlib.shape_predictor(predictor_68_point_model)
 
     # read the image
     cap = cv2.VideoCapture(0)
@@ -39,12 +36,9 @@ def get_pictures(name):
 
             face_frame = frame[int(0.8 * y1): int(1.2 * y2), int(0.8 * x1): int(x2 * 1.2)]
 
-            # Create landmark object
-            landmarks = predictor(image=gray, box=face)
-
             # show the image
 
-            cv2.imshow(winname="Face", mat=face_frame)
+            cv2.imshow(winname="Face", mat=frame)
             save_location = resource_filename(__name__, "../dataset/" + name)
             p = os.path.sep.join([save_location + '/', "{}.png".format(str(total).zfill(3))])
             cv2.imwrite(p, face_frame)

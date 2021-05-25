@@ -1,11 +1,11 @@
-import glob
+import os
+import pickle
+import time
 
-import face_recognition.api as face_recognition
 import cv2
 import numpy as np
-import pickle
-import os
-import time
+
+import face_recognition.api as face_recognition
 
 
 def predict(frames_count=30):
@@ -52,7 +52,7 @@ def predict(frames_count=30):
     face_locations = []
     face_encodings = []
     face_names = []
-    process_this_frame = True
+    process = True
     faces = []
     approved = False
     start_time = time.time()
@@ -71,7 +71,7 @@ def predict(frames_count=30):
         rgb_small_frame = small_frame[:, :, ::-1]
 
         # Only process every other frame of video to save time
-        if process_this_frame:
+        if process:
             # Find all the faces and face encodings in the current frame of video
             face_locations = face_recognition.face_locations(rgb_small_frame)
             face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
@@ -96,46 +96,37 @@ def predict(frames_count=30):
                     total_time = time.time() - start_time
                     number_of_frames = len(faces)
 
-        process_this_frame = not process_this_frame
+        process = not process
 
         # Display the results
         if approved is False:
             for (top, right, bottom, left), name in zip(face_locations, face_names):
-                # Scale back up face locations since the frame we detected in was scaled to 1/4 size
                 top *= 4
                 right *= 4
                 bottom *= 4
                 left *= 4
 
-                # Draw a box around the face
                 cv2.rectangle(frame, (left, top), (right, bottom), (0, 0, 255), 2)
 
-                # Draw a label with a name below the face
-                cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
-                font = cv2.FONT_HERSHEY_DUPLEX
-                cv2.putText(frame, name, (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
+                cv2.rectangle(frame, (left, bottom - 40), (right, bottom), (0, 0, 255), cv2.FILLED)
+                cv2.putText(frame, name, (left + 10, bottom - 10), 0, 1.1, (255, 255, 255), 1)
                 faces.append(name.lower())
         else:
             for (top, right, bottom, left), name in zip(face_locations, face_names):
-                # Scale back up face locations since the frame we detected in was scaled to 1/4 size
                 top *= 4
                 right *= 4
                 bottom *= 4
                 left *= 4
 
-                # Draw a box around the face
                 cv2.rectangle(frame, (left, top), (right, bottom), (127, 255, 0), 2)
 
-                # Draw a label with a name below the face
                 cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (127, 255, 0), cv2.FILLED)
                 font = cv2.FONT_HERSHEY_DUPLEX
                 cv2.putText(frame, f'Approved as {name}', (left + 6, bottom - 6), font, 1.0, (255, 255, 255), 1)
 
                 faces.append(name.lower())
-        # Display the resulting image
         cv2.imshow('Video', frame)
 
-        # Hit 'q' on the keyboard to quit!
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 

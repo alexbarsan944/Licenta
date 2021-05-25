@@ -1,10 +1,13 @@
+import os
+
 import PIL.Image
+import cv2
 import dlib
 import numpy as np
 from PIL import ImageFile
 from pkg_resources import resource_filename
-import os
-import cv2
+
+# START CODE FROM https://github.com/ageitgey/face_recognition
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -13,14 +16,11 @@ face_detector = dlib.get_frontal_face_detector()
 predictor_5_point_model = resource_filename(__name__, "../models/shape_predictor_5_face_landmarks.dat")
 pose_predictor_5_point = dlib.shape_predictor(predictor_5_point_model)
 
-predictor_68_point_model = resource_filename(__name__, "../models/shape_predictor_68_face_landmarks.dat")
-pose_predictor_68_point = dlib.shape_predictor(predictor_68_point_model)
-
 face_recognition_model = resource_filename(__name__, "../models/dlib_face_recognition_resnet_model_v1.dat")
 face_encoder = dlib.face_recognition_model_v1(face_recognition_model)
 
 
-def rect_to_trbl(rect):
+def rect_to_trbl(rect):  # top, right, bottom, left
     return rect.top(), rect.right(), rect.bottom(), rect.left()
 
 
@@ -55,16 +55,13 @@ def face_locations(img, number_of_times_to_upsample=1):
             _raw_face_locations(img, number_of_times_to_upsample)]
 
 
-def _raw_face_landmarks(face_image, face_locations=None, model='5'):
+def _raw_face_landmarks(face_image, face_locations=None):
     if face_locations is None:
         face_locations = _raw_face_locations(face_image)
     else:
         face_locations = [trbl_to_rect(face_location) for face_location in face_locations]
 
-    if model == '5':
-        pose_predictor = pose_predictor_5_point
-    else:
-        pose_predictor = pose_predictor_68_point
+    pose_predictor = pose_predictor_5_point
 
     return [pose_predictor(face_image, face_location) for face_location in face_locations]
 
@@ -75,12 +72,12 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
             raw_landmark_set in raw_landmarks]
 
 
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.4):
+def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.48):
     return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
 
 
 def face_landmarks(face_image, face_locations=None):
-    landmarks = _raw_face_landmarks(face_image, face_locations, model='5')
+    landmarks = _raw_face_landmarks(face_image, face_locations)
     landmarks_as_tuples = [[(p.x, p.y) for p in landmark.parts()] for landmark in landmarks]
     return [{
         "left_eyebrow": points[17:22],
@@ -91,13 +88,17 @@ def face_landmarks(face_image, face_locations=None):
     } for points in landmarks_as_tuples]
 
 
+# END CODE FROM https://github.com/ageitgey/face_recognition
+
 def video_pic_convertor(video_location, output_location, count=0):
     vidcap = cv2.VideoCapture(video_location)
     success, image = vidcap.read()
     while success:
         # small = cv2.resize(image, (0, 0), fx=0.5, fy=0.5)
-        cv2.imwrite(f"{output_location}/frame{count}.jpg", image)  # save frame as JPEG file
-        success, image = vidcap.read()
+        small_frame = cv2.resize(image, (0, 0), fx=0.25, fy=0.25)
+
+        cv2.imwrite(f"{output_location}/frame{count}.jpg", small_frame)  # save frame as JPEG file
+        success, frame = vidcap.read()
         if count % 10 == 0:
             print('Read a new frame: ', success, f"{output_location}/frame{count}.jpg")
         count += 1
