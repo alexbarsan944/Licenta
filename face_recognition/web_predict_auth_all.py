@@ -21,7 +21,7 @@ def predict(frames_count=30):
     # START CODE FROM https://github.com/mmenxin/eye-blink-detection-demo
 
     EYE_AR_THRESH = 0.3
-    EYE_AR_CONSEC_FRAMES = 1
+    EYE_AR_CONSEC_FRAMES = 2
 
     COUNTER = 0
     TOTAL = 0
@@ -78,15 +78,10 @@ def predict(frames_count=30):
             known_face_names.append(name)
 
     # Initialize some variables
-    face_locations = []
-    face_encodings = []
-    face_names = []
-    process = True
     faces = []
     approved = False
     start_time = time.time()
     total_time = None
-    frames_ok = False
     number_of_frames = None
 
     while True:
@@ -143,7 +138,7 @@ def predict(frames_count=30):
 
         face_locations = face_recognition.face_locations(rgb_small_frame)
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
-
+        print(len(face_encodings))
         face_names = []
         for face_encoding in face_encodings:
             # See if the face is a match for the known face(s)

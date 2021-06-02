@@ -72,7 +72,7 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
             raw_landmark_set in raw_landmarks]
 
 
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.45):
+def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.4):
     return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
 
 
@@ -95,9 +95,9 @@ def video_pic_convertor(video_location, output_location, count=0):
     success, image = vidcap.read()
     while success:
         # small = cv2.resize(image, (0, 0), fx=0.5, fy=0.5)
-        small_frame = cv2.resize(image, (0, 0), fx=0.25, fy=0.25)
+        small_frame = cv2.resize(image, (0, 0), fx=0.75, fy=0.75)
 
-        cv2.imwrite(f"{output_location}/frame{count}.jpg", small_frame)  # save frame as JPEG file
+        cv2.imwrite(f"{output_location}/frame{count}.jpg", image)  # save frame as JPEG file
         success, frame = vidcap.read()
         if count % 10 == 0:
             print('Read a new frame: ', success, f"{output_location}/frame{count}.jpg")

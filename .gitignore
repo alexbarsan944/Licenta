@@ -125,3 +125,6 @@ venv.bak/
 dmypy.json
 libs/dlib
 libs/dlib
+.DS_Store
+.DS_Store
+.DS_Store
