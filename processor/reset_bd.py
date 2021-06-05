@@ -2,6 +2,7 @@ import os
 import pickle
 
 import numpy as np
+import pandas as pd
 from pkg_resources import resource_filename
 
 import face_recognition.api as face_recognition
@@ -49,6 +50,8 @@ def print_main_files():
         data2 = pickle.load(filehandle)
     print(np.array(data).shape)
     print(np.array(data2))
+    # df = pd.DataFrame(data=data2, index=data2.values())
+    # df.to_csv(f"counter.csv", index=True, header=True)
 
 
 def store_face_encodings(name, dataset_count=500):
@@ -83,9 +86,8 @@ def store_face_encodings(name, dataset_count=500):
     print_main_files()
 
 
-# store_face_encodings('ioana')
 # update_main_files_from_folder()
-# print_main_files()
+print_main_files()
 
 
 def store_face_encodings_all(dataset_count=500):

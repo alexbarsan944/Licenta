@@ -35,7 +35,8 @@ def trim_trbl(css, image_shape):
 def face_distance(face_encodings, face_to_compare):
     if len(face_encodings) == 0:
         return np.empty(0)
-
+    # face_encodings = (9280, 128)
+    # face_to_compare = (128,)
     return np.linalg.norm(face_encodings - face_to_compare, axis=1)
 
 
@@ -73,6 +74,7 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
 
 
 def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.4):
+    # print(face_distance(known_face_encodings, face_encoding_to_check))
     return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
 
 
@@ -90,14 +92,18 @@ def face_landmarks(face_image, face_locations=None):
 
 # END CODE FROM https://github.com/ageitgey/face_recognition
 
+def face_distances(known_face_encodings, face_encoding_to_check):
+    return list(face_distance(known_face_encodings, face_encoding_to_check))
+
+
 def video_pic_convertor(video_location, output_location, count=0):
     vidcap = cv2.VideoCapture(video_location)
     success, image = vidcap.read()
     while success:
         # small = cv2.resize(image, (0, 0), fx=0.5, fy=0.5)
-        small_frame = cv2.resize(image, (0, 0), fx=0.75, fy=0.75)
+        small_frame = cv2.resize(image, (0, 0), fx=0.25, fy=0.25)
 
-        cv2.imwrite(f"{output_location}/frame{count}.jpg", image)  # save frame as JPEG file
+        cv2.imwrite(f"{output_location}/frame{count}.jpg", small_frame)  # save frame as JPEG file
         success, frame = vidcap.read()
         if count % 10 == 0:
             print('Read a new frame: ', success, f"{output_location}/frame{count}.jpg")
