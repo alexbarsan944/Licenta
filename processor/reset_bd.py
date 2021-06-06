@@ -50,8 +50,8 @@ def print_main_files():
         data2 = pickle.load(filehandle)
     print(np.array(data).shape)
     print(np.array(data2))
-    # df = pd.DataFrame(data=data2, index=data2.values())
-    # df.to_csv(f"counter.csv", index=True, header=True)
+    df = pd.DataFrame(data=data2, index=data2.values())
+    df.to_csv(f"counter.csv", index=True, header=True)
 
 
 def store_face_encodings(name, dataset_count=600):
@@ -85,16 +85,6 @@ def store_face_encodings(name, dataset_count=600):
     update_main_files_from_folder()
     print_main_files()
 
-
-store_face_encodings('Raluca')
-store_face_encodings('Stefan')
-store_face_encodings('tomsa_s')
-store_face_encodings('twin1')
-store_face_encodings('twin2')
-store_face_encodings('yt1')
-store_face_encodings('yt2')
-store_face_encodings('yt3')
-store_face_encodings('yt4')
 
 # update_main_files_from_folder()
 # print_main_files()
