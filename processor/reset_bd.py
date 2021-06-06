@@ -54,7 +54,7 @@ def print_main_files():
     # df.to_csv(f"counter.csv", index=True, header=True)
 
 
-def store_face_encodings(name, dataset_count=500):
+def store_face_encodings(name, dataset_count=600):
     known_face_encodings = []
     total = {}
     counter = 0
@@ -86,11 +86,21 @@ def store_face_encodings(name, dataset_count=500):
     print_main_files()
 
 
+store_face_encodings('Raluca')
+store_face_encodings('Stefan')
+store_face_encodings('tomsa_s')
+store_face_encodings('twin1')
+store_face_encodings('twin2')
+store_face_encodings('yt1')
+store_face_encodings('yt2')
+store_face_encodings('yt3')
+store_face_encodings('yt4')
+
 # update_main_files_from_folder()
-print_main_files()
+# print_main_files()
 
 
-def store_face_encodings_all(dataset_count=500):
+def store_face_encodings_all(dataset_count=600):
     known_face_encodings = []
     total = {}
     names = face_recognition.get_known_people_from_dataset()

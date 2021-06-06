@@ -127,7 +127,7 @@ def produce_video(abs_path_to_video, should_be):
                 print("Writing frame {} / {}".format(frame_number, length), f"Accuracy={acc}%")
 
         # Display the resulting image
-        output_movie.write(frame)
+        # output_movie.write(frame)
 
         # Hit 'q' on the keyboard to quit!
         if cv2.waitKey(1) & 0xFF == ord('q'):
